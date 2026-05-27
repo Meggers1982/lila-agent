@@ -78,3 +78,23 @@ Add an entry here the first time you catch any of these failing in production.
 
 **Prompt snapshot:** `prompts/versions/system_v1.3.md`
 **Eval result after:** run `python evals/run_evals.py` to establish baseline
+
+## 2026-05-27 — v1.3.0 → v1.4.0
+**Change:** Token optimisation pass — six changes to reduce cost per session.
+
+1. **Prompt caching** (`scripts/deploy.py`): added `--system-cache-control ephemeral` to both create and update commands. System prompt tokens (~1,500) now charged at 10% rate on cached reads rather than full price every turn.
+
+2. **Reference image compression** (`scripts/run_agent.py`): reference images resized to 1024px max longest edge and re-encoded as JPEG at quality 85 via Pillow before base64 encoding. Reduces vision token cost by 50–80% for typical source files. Added `pillow>=10.0.0` to `requirements.txt`.
+
+3. **Web fetch truncation** (`tools/web_fetch.py`): raw fetch results capped at 4,000 characters (~1,000 tokens). Brand voice and palette cues are in the opening content; nav/footer boilerplate is not needed.
+
+4. **Session-scoped fetch cache** (`memory/cache.py`, `tools/web_fetch.py`): web fetch results cached for the session lifetime via a new `SessionCache` module. Prevents re-fetching identical URLs when Lila references the brand site during directions and again during image prompt writing.
+
+5. **Per-session token budget** (`config/settings.py`, `scripts/run_agent.py`): hard cap of 120,000 input / 8,000 output tokens per session. Warning at 75%, hard stop at 100%. Token usage and estimated cost displayed at session end.
+
+6. **Skill file load once per session** (`prompts/system.md`): Skills section updated to instruct Lila to read SKILL.md once per session only, not on every direction turn.
+
+**Model tiering** (`config/settings.py`): `CREATIVE_MODEL` and `UTILITY_MODEL` constants defined. Per-turn model switching deferred until Claude Managed Agents supports it natively — documented for future implementation.
+
+**Eval count:** unchanged at 16/16
+**Prompt snapshot:** `prompts/versions/system_v1.4.md`

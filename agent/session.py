@@ -44,9 +44,15 @@ class SessionState:
     # Approval gate (Production Rule #1)
     generation_approved: bool = False
 
+    # Token optimisation flags
+    skill_file_loaded: bool = False    # read once per session, not on every direction turn
+    brand_site_fetched: bool = False   # track whether we've already fetched the brand URL
+
     # Cost tracking
     estimated_image_count: int = 0
     images_generated: int = 0
+    input_tokens_used: int = 0
+    output_tokens_used: int = 0
 
     def advance_to(self, phase: Phase):
         """Transition to the next phase. Logs the transition."""
@@ -69,6 +75,22 @@ class SessionState:
         self.assets_generated.append(asset)
         self.images_generated += 1
 
+    def record_token_usage(self, input_tokens: int, output_tokens: int):
+        """Accumulate token usage across turns for cost tracking."""
+        self.input_tokens_used += input_tokens
+        self.output_tokens_used += output_tokens
+
+    def estimated_cost_usd(self) -> float:
+        """
+        Rough cost estimate based on claude-opus-4-6 pricing.
+        Input: $15/M tokens. Output: $75/M tokens.
+        Cached input reads are ~90% cheaper but counted separately by the platform.
+        Use this as an order-of-magnitude guide, not a billing source.
+        """
+        input_cost  = (self.input_tokens_used  / 1_000_000) * 15.00
+        output_cost = (self.output_tokens_used / 1_000_000) * 75.00
+        return round(input_cost + output_cost, 4)
+
     def to_dict(self) -> dict:
         """Serialize state for logging and debugging."""
         return {
@@ -81,4 +103,8 @@ class SessionState:
             "assets_generated": len(self.assets_generated),
             "generation_approved": self.generation_approved,
             "images_generated": self.images_generated,
+            "skill_file_loaded": self.skill_file_loaded,
+            "input_tokens_used": self.input_tokens_used,
+            "output_tokens_used": self.output_tokens_used,
+            "estimated_cost_usd": self.estimated_cost_usd(),
         }

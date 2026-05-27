@@ -67,6 +67,7 @@ def create_or_update_agent() -> str:
         result = run([
             "ant", "beta:agents", "update", existing_id,
             "--system", system_prompt,
+            "--system-cache-control", "ephemeral",   # cache system prompt — 90% cheaper on re-reads
             "--model", json.dumps({"id": "claude-opus-4-6"}),
         ])
     else:
@@ -76,6 +77,7 @@ def create_or_update_agent() -> str:
             "--name", "Lila: Social Image Producer",
             "--model", json.dumps({"id": "claude-opus-4-6"}),
             "--system", system_prompt,
+            "--system-cache-control", "ephemeral",   # cache system prompt — 90% cheaper on re-reads
             "--tool", json.dumps({"type": "agent_toolset_20260401"}),
         ])
 
