@@ -380,7 +380,7 @@
       <span>Model: claude-opus-4-6</span>
       <span>Image: GPT-5.5 + GPT Image 2</span>
       <span>Platform: Claude Managed Agents</span>
-      <span>Prompt: v1.3.0</span>
+      <span>Prompt: v1.4.0</span>
     </div>
   </div>
 
@@ -399,6 +399,7 @@
       <li><a href="#improving"><span class="n">09</span>Improving Lila over time</a></li>
       <li><a href="#troubleshoot"><span class="n">10</span>Troubleshooting</a></li>
       <li><a href="#reference"><span class="n">11</span>Quick reference</a></li>
+      <li><a href="#tokens"><span class="n">12</span>Keeping costs down</a></li>
     </ol>
   </div>
 
@@ -493,7 +494,7 @@ OPENAI_API_KEY=sk-...</pre></div>
         <div class="step-body">
           <span class="step-title">Run the eval suite to confirm everything works</span>
           <div class="code-block"><pre>python evals/run_evals.py</pre></div>
-          <p class="step-desc">You should see 11/11 passed. If any fail, see <a href="#troubleshoot">§09 Troubleshooting</a>.</p>
+          <p class="step-desc">You should see 16/16 passed. If any fail, see <a href="#troubleshoot">§09 Troubleshooting</a>.</p>
         </div>
       </li>
     </ul>
@@ -533,6 +534,7 @@ OPENAI_API_KEY=sk-...</pre></div>
           <span class="step-title">Terminal 2 — start a session</span>
           <div class="code-block"><pre>python scripts/run_agent.py</pre></div>
           <p class="step-desc">Lila will prompt you for a brief. Type it and press Enter twice when done.</p>
+          <p class="step-desc" style="margin-top: 0.6rem;">If you attached reference images, you'll see compression output before the session starts — this is normal and reduces token cost.</p>
           <p class="step-desc" style="margin-top: 0.6rem;">To attach visual references, add <code>--references</code> before starting:</p>
           <div class="code-block"><pre>python scripts/run_agent.py --references moodboard.jpg ref2.png</pre></div>
           <p class="step-desc">See <a href="#references">§05 Using reference images</a> for full details.</p>
@@ -891,7 +893,7 @@ emberoak-autumn-story-cta-9x16.png</pre></div>
         <div class="step-body">
           <span class="step-title">Run the eval suite</span>
           <div class="code-block"><pre>python evals/run_evals.py</pre></div>
-          <p class="step-desc">Must pass 16/16 before deploying. If it doesn't, keep refining.</p>
+          <p class="step-desc">Must pass 16/16 before deploying. If it doesn't, keep refining. All 16 cases still apply — the token optimisations don't change expected behaviour.</p>
         </div>
       </li>
       <li>
@@ -974,6 +976,11 @@ python scripts/deploy.py</pre></div>
           <td>Run <code>npm install -g @anthropic-ai/claude-code</code>, then try again</td>
         </tr>
         <tr>
+          <td>Reference images not compressed</td>
+          <td>Pillow not installed</td>
+          <td>Run <code>pip install pillow</code> or <code>pip install -r requirements.txt</code></td>
+        </tr>
+        <tr>
           <td>Reference image skipped — unsupported type</td>
           <td>File isn't JPG, PNG, WEBP, or GIF</td>
           <td>Convert to one of the supported formats and re-run with the new path</td>
@@ -1005,6 +1012,7 @@ python scripts/deploy.py</pre></div>
         <tr><th>Command</th><th>What it does</th></tr>
       </thead>
       <tbody>
+        <tr><td>pip install -r requirements.txt</td><td>Install/update dependencies (run after downloading a new zip)</td></tr>
         <tr><td>python mcp_servers/image_gen_server.py</td><td>Start image generation server (Terminal 1, always first)</td></tr>
         <tr><td>python scripts/run_agent.py</td><td>Start a new session with interactive brief prompt</td></tr>
         <tr><td>python scripts/run_agent.py --brief "..."</td><td>Start a session with brief passed inline</td></tr>
@@ -1030,8 +1038,93 @@ python scripts/deploy.py</pre></div>
       <div>&nbsp;&nbsp;skills/image-assets/<span class="ann">← format catalog + registers</span></div>
       <div>&nbsp;&nbsp;evals/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ann">← run before every prompt change</span></div>
       <div>&nbsp;&nbsp;memory/prompt_improvement_log.md &nbsp;<span class="ann">← log every fix</span></div>
+      <div>&nbsp;&nbsp;memory/cache.py &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ann">← session fetch cache</span></div>
+      <div>&nbsp;&nbsp;config/settings.py &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ann">← tune token optimisation constants</span></div>
     </div>
   </div>
+
+
+  <!-- 12 -->
+  <div class="section" id="tokens">
+    <div class="section-header">
+      <span class="section-num">12</span>
+      <h2>Keeping costs down</h2>
+    </div>
+
+    <p>Six token optimisations are active by default. Most are invisible — they run automatically. This section explains what they are and what you can tune.</p>
+
+    <div class="callout callout-tip">
+      <strong>After downloading a new zip</strong>
+      Run <code>pip install -r requirements.txt</code> to pick up Pillow (image compression), then <code>python scripts/deploy.py</code> to push the updated agent config with prompt caching enabled. Both are required for the full savings.
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Optimisation</th>
+          <th>What it does</th>
+          <th>Where it lives</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Prompt caching</td>
+          <td>System prompt (~1,500 tokens) is cached after the first turn of each session. Cached reads cost 10% of normal input price. Saves ~90% on system prompt tokens for every turn after the first.</td>
+          <td><code>scripts/deploy.py</code> — <code>--system-cache-control ephemeral</code> flag on both create and update</td>
+        </tr>
+        <tr>
+          <td>Reference image compression</td>
+          <td>Reference images are resized to 1024px max longest edge and re-saved as JPEG at quality 85 before base64 encoding. A 3MB source image typically compresses to under 200KB — 80%+ reduction in vision tokens with no quality loss for palette/composition reading. Terminal shows before/after size per image.</td>
+          <td><code>scripts/run_agent.py</code> — <code>compress_reference_image()</code>. Tune in <code>config/settings.py</code>: <code>REFERENCE_IMAGE_MAX_PX</code> and <code>REFERENCE_IMAGE_JPEG_QUALITY</code></td>
+        </tr>
+        <tr>
+          <td>Web fetch truncation</td>
+          <td>Brand website content is capped at 4,000 characters (~1,000 tokens) before entering context. Brand voice, colour language, and product copy are always in the opening section. Nav menus and footers aren't worth paying for.</td>
+          <td><code>tools/web_fetch.py</code>. Tune in <code>config/settings.py</code>: <code>WEB_FETCH_MAX_CHARS</code></td>
+        </tr>
+        <tr>
+          <td>Session fetch cache</td>
+          <td>Web fetch results are cached in memory for the session lifetime. If Lila references the brand site during direction proposals and again during image prompt writing, the second read is free. Cache resets between sessions.</td>
+          <td><code>memory/cache.py</code> — <code>SessionCache</code> singleton</td>
+        </tr>
+        <tr>
+          <td>Per-session token budget</td>
+          <td>Hard cap of 120,000 input / 8,000 output tokens per session. Warning printed at 75%. Hard stop at 100%. Token count and estimated cost in USD printed at session end.</td>
+          <td><code>config/settings.py</code>: <code>MAX_INPUT_TOKENS_PER_SESSION</code>, <code>MAX_OUTPUT_TOKENS_PER_SESSION</code>, <code>BUDGET_WARNING_USD</code></td>
+        </tr>
+        <tr>
+          <td>Skill file once per session</td>
+          <td>Lila reads <code>skills/image-assets/SKILL.md</code> once per session, not on every direction turn. Saves ~800 tokens on any session with more than one direction round.</td>
+          <td><code>prompts/system.md</code> — Skills section instruction</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p style="margin-top: 1.5rem;"><strong>Tuning the settings</strong></p>
+    <p>All the numbers above are configurable in <code>config/settings.py</code> without touching any other file. The defaults are conservative — they favour cost savings over marginal quality gains. If you find the web fetch truncation is cutting off content you need, raise <code>WEB_FETCH_MAX_CHARS</code>. If reference images look too compressed for a particular project, raise <code>REFERENCE_IMAGE_MAX_PX</code> to 1536 or <code>REFERENCE_IMAGE_JPEG_QUALITY</code> to 95.</p>
+
+    <div class="callout callout-note">
+      <strong>Model tiering — coming later</strong>
+      <code>config/settings.py</code> defines <code>CREATIVE_MODEL</code> (Opus, for directions and image prompts) and <code>UTILITY_MODEL</code> (Haiku, for clarifying questions and memory formatting). Per-turn model switching isn't yet supported by Claude Managed Agents natively. When it is, switching utility turns to Haiku will reduce cost by roughly another 80% on those steps.
+    </div>
+
+    <p><strong>What a typical session costs</strong></p>
+    <p>With all optimisations active, a typical 8-turn Lila session generating 6 images runs approximately:</p>
+
+    <table>
+      <thead><tr><th>Component</th><th>Tokens</th><th>Est. cost</th></tr></thead>
+      <tbody>
+        <tr><td>System prompt (cached, 7 of 8 turns)</td><td>~10,500 cached input</td><td>~$0.016</td></tr>
+        <tr><td>System prompt (uncached, turn 1)</td><td>~1,500 input</td><td>~$0.023</td></tr>
+        <tr><td>Conversation context (grows each turn)</td><td>~40,000 input</td><td>~$0.60</td></tr>
+        <tr><td>Lila's responses</td><td>~4,000 output</td><td>~$0.30</td></tr>
+        <tr><td>Reference images (2 × compressed)</td><td>~3,000 input</td><td>~$0.045</td></tr>
+        <tr><td><strong>Total estimate</strong></td><td></td><td><strong>~$0.98</strong></td></tr>
+      </tbody>
+    </table>
+    <p style="font-size: 13px; color: var(--ink-muted); margin-top: 0.5rem;">Image generation costs (GPT Image 2) are separate and billed by OpenAI — approximately $0.04–0.08 per image depending on size.</p>
+  </div>
+
 
 </div>
 </body>
