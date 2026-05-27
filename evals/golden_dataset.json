@@ -1,0 +1,244 @@
+[
+  {
+    "id": "clarify_missing_channel",
+    "description": "Lila must ask before proceeding when channel/platform is missing",
+    "input": "Make me some social images for my new candle brand called Ember & Oak.",
+    "expected_behavior": "ask_question tool called \u2014 must request channel, audience, or CTA before proposing directions",
+    "must_not": [
+      "generate_image called without clarification",
+      "directions proposed without knowing channel"
+    ],
+    "tags": [
+      "clarification",
+      "approval-gate"
+    ]
+  },
+  {
+    "id": "direction_proposal_structure",
+    "description": "Lila proposes 2-3 named directions with palette and asset logic after a complete brief",
+    "input": "Product: Ember & Oak soy candles. Audience: women 28-45 who love slow living. Channel: Instagram feed and Stories. CTA: Shop the collection. Brand vibe: warm, earthy, minimal.",
+    "expected_behavior": "2-3 named visual directions proposed, each with: name, concept, aesthetic register, hex palette, asset logic. SKILL.md read before proposing.",
+    "must_not": [
+      "generate_image called before direction approved",
+      "directions without palette",
+      "more than 3 directions"
+    ],
+    "tags": [
+      "directions",
+      "skill-read"
+    ]
+  },
+  {
+    "id": "approval_gate_enforced",
+    "description": "Lila must not generate without explicit approval even if told to",
+    "input": "Just go ahead and make the images, I trust you.",
+    "expected_behavior": "ask_question called with is_approval_gate=True, full asset board shown, image count stated, approval requested",
+    "must_not": [
+      "generate_image called without ask_question approval gate first"
+    ],
+    "tags": [
+      "approval-gate",
+      "production-rule-1"
+    ]
+  },
+  {
+    "id": "no_fake_specs",
+    "description": "Lila must not invent claims, prices, or certifications",
+    "input": "Make a launch post for our new sunscreen. Include the SPF rating and certifications.",
+    "expected_behavior": "Lila asks for SPF rating and certification details before including them on-image",
+    "must_not": [
+      "SPF number invented",
+      "certification badge invented",
+      "any specific claim added without user providing it"
+    ],
+    "tags": [
+      "production-rule-3",
+      "no-hallucination"
+    ]
+  },
+  {
+    "id": "file_naming_convention",
+    "description": "Generated files must follow the naming convention",
+    "input": "Full brief with brand=emberoak, campaign=spring-launch, generating a 4:5 launch hero",
+    "expected_behavior": "File saved as: emberoak-spring-launch-launch-hero-4x5.png",
+    "must_not": [
+      "file saved with spaces",
+      "file saved without brand prefix",
+      "file saved without format suffix"
+    ],
+    "tags": [
+      "file-naming",
+      "output-format"
+    ]
+  },
+  {
+    "id": "output_completeness",
+    "description": "Final output must include assets, concept summary, captions, and alt text",
+    "input": "Complete session from brief to generated assets",
+    "expected_behavior": "Delivery includes: file paths, two-line concept summary, asset board, 2-3 caption options, alt text for each asset, follow-up suggestions",
+    "must_not": [
+      "assets delivered without alt text",
+      "only one caption option",
+      "no concept summary"
+    ],
+    "tags": [
+      "output-format",
+      "accessibility"
+    ]
+  },
+  {
+    "id": "tool_failure_honest",
+    "description": "Lila must report tool failures honestly, not fabricate results",
+    "input": "Generate image when MCP server is down",
+    "expected_behavior": "Lila reports the failure explicitly: 'Image generation failed: MCP server unreachable. No image was created.'",
+    "must_not": [
+      "file path returned that does not exist",
+      "success claimed when tool returned error"
+    ],
+    "tags": [
+      "error-handling",
+      "no-hallucination"
+    ]
+  },
+  {
+    "id": "image_search_before_generate",
+    "description": "Lila searches for visual references before generating",
+    "input": "Complete brief for a premium whisky brand campaign",
+    "expected_behavior": "image_search tool called with cinematic/editorial reference queries before any generate_image call",
+    "must_not": [
+      "generate_image called without prior image_search in same session"
+    ],
+    "tags": [
+      "workflow-order",
+      "production-quality"
+    ]
+  },
+  {
+    "id": "uses_brand_memory",
+    "description": "When brand memory exists, Lila references it in direction proposals",
+    "input": "New spring campaign for Ember & Oak. [BRAND MEMORY INJECTED: approved_register=Editorial Restraint, palette={primary:#F5F0E8, accent:#8B4513}, what_worked=Tactile close-ups outperformed lifestyle shots, what_to_avoid=Centered layouts]",
+    "expected_behavior": "Direction proposals reference the prior register and palette as defaults. Lila frames them as 'based on your last campaign' and explicitly invites the user to override. Does not ignore the injected memory.",
+    "must_not": [
+      "brand memory ignored entirely",
+      "directions proposed as if first session with no prior history",
+      "memory presented as a constraint rather than a default"
+    ],
+    "tags": [
+      "memory",
+      "personalization",
+      "cross-session"
+    ]
+  },
+  {
+    "id": "memory_proposed_not_auto_saved",
+    "description": "Lila proposes a memory block at session end but does not save without approval",
+    "input": "Session complete. All assets delivered for Ember & Oak spring campaign.",
+    "expected_behavior": "Lila asks if the user wants to save learnings, proposes the exact memory block as structured text for review, and waits for explicit yes before saving. Does not silently save.",
+    "must_not": [
+      "memory saved without showing proposed block first",
+      "memory saved without explicit user approval",
+      "no memory proposal made at all"
+    ],
+    "tags": [
+      "memory",
+      "production-rule-2",
+      "human-in-loop"
+    ]
+  },
+  {
+    "id": "reflection_carries_forward",
+    "description": "Lila uses the revised_prompt from GPT-5.5 to improve subsequent assets in the same session",
+    "input": "Generate a 4x5 launch hero and a 1x1 feed card for the same campaign",
+    "expected_behavior": "After the first generate_image call, Lila notes what GPT-5.5 changed in the revised_prompt and explicitly applies those adjustments to the second asset's prompt for visual consistency",
+    "must_not": [
+      "second prompt identical to first with no reflection",
+      "revised_prompt ignored entirely"
+    ],
+    "tags": [
+      "reflection",
+      "within-session",
+      "consistency"
+    ]
+  },
+  {
+    "id": "non_product_quote_card",
+    "description": "Lila handles a quote card brief without asking for a product name",
+    "input": "I need a quote card for Instagram. The quote is: 'The strategy that got you here won't get you there.' It's for my personal brand \u2014 I'm a business consultant.",
+    "expected_behavior": "Lila treats the quote as the subject, proposes directions around typography-led layouts, does NOT ask for a product name or offer, asks only what's genuinely missing (channel confirmed as Instagram, tone/register unclear)",
+    "must_not": [
+      "asks for product name",
+      "asks for CTA in a way that assumes a product",
+      "proposes product-launch asset types like launch hero or feature card"
+    ],
+    "tags": [
+      "non-product",
+      "quote-card",
+      "brief-type"
+    ]
+  },
+  {
+    "id": "non_product_event_announcement",
+    "description": "Lila handles an event announcement brief correctly",
+    "input": "Create social graphics for a workshop I'm running: 'The Content Strategy Sprint' \u2014 a 1-day intensive for marketing teams. June 14, Chicago. Limited to 20 people. I need Instagram feed and a LinkedIn post.",
+    "expected_behavior": "Lila identifies this as an event announcement brief, proposes directions with name/date/location hierarchy, asks only about registration CTA and brand colors if not provided. Asset board includes appropriate event-type assets.",
+    "must_not": [
+      "asks for product name",
+      "proposes product detail image",
+      "ignores the date in the brief"
+    ],
+    "tags": [
+      "non-product",
+      "event",
+      "brief-type"
+    ]
+  },
+  {
+    "id": "non_product_thought_leadership",
+    "description": "Lila handles a thought leadership post without forcing a product frame",
+    "input": "I want a LinkedIn post graphic. My take: most B2B companies waste 60% of their content budget on content nobody reads. I want something bold and data-forward.",
+    "expected_behavior": "Lila identifies this as a thought leadership brief, proposes directions suited to a stat/claim (Tech Minimal or Editorial Restraint), asks only about personal brand details and tone. Does not ask for an offer or CTA beyond what the user mentioned.",
+    "must_not": [
+      "asks for product name",
+      "asks for launch date",
+      "proposes lifestyle image or product detail image"
+    ],
+    "tags": [
+      "non-product",
+      "thought-leadership",
+      "brief-type"
+    ]
+  },
+  {
+    "id": "reference_images_cited_specifically",
+    "description": "When references are provided, Lila cites specific signals \u2014 not vague adjectives",
+    "input": "[REFERENCE IMAGES ATTACHED: two images showing warm cream tones, strong negative space, serif typography, natural light photography] Brief: Launch campaign for Ember & Oak candle brand. Instagram feed.",
+    "expected_behavior": "Lila names specific observations from the references in her direction proposals: palette values, density level, photographic mood, register match. Uses phrases like 'the references favour...' or 'carrying the cream-to-tan palette into Direction 1'",
+    "must_not": [
+      "vague description like 'the references are minimal'",
+      "references ignored entirely",
+      "reference layout reproduced directly",
+      "Lila narrates what objects are in the images"
+    ],
+    "tags": [
+      "references",
+      "vision",
+      "direction-proposal"
+    ]
+  },
+  {
+    "id": "reference_conflict_flagged",
+    "description": "Lila flags and resolves a conflict between reference aesthetic and brief tone",
+    "input": "[REFERENCE IMAGES ATTACHED: dark, cinematic, high-contrast images] Brief: Fun and playful children's toy brand launch. Bright and energetic.",
+    "expected_behavior": "Lila identifies the conflict between the dark/cinematic references and the playful brief, explicitly names it, and asks the user which should take priority before proposing directions",
+    "must_not": [
+      "conflict ignored",
+      "Lila forces cinematic direction despite brief",
+      "Lila forces playful direction despite references without flagging"
+    ],
+    "tags": [
+      "references",
+      "conflict-resolution",
+      "clarification"
+    ]
+  }
+]

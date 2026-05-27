@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lila — How to Run</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink:        #1A1814;
+    --ink-mid:    #4A4740;
+    --ink-muted:  #7A776E;
+    --paper:      #FAFAF7;
+    --paper-warm: #F4F1EB;
+    --paper-rule: #E8E4DB;
+    --accent:     #B5490A;
+    --accent-lt:  #F5EDE7;
+    --code-bg:    #F0EDE6;
+    --green:      #2D6A3F;
+    --green-lt:   #E8F3EC;
+    --amber:      #92620A;
+    --amber-lt:   #FBF3E3;
+    --rule:       #D4CFC5;
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.75;
+    padding: 0;
+  }
+
+  .page {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 5rem 3rem 8rem;
+  }
+
+  /* ── Header ── */
+  .header {
+    border-bottom: 1.5px solid var(--ink);
+    padding-bottom: 2rem;
+    margin-bottom: 3.5rem;
+  }
+  .header-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 3rem;
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .header h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .header-meta {
+    margin-top: 1.25rem;
+    font-size: 14px;
+    color: var(--ink-muted);
+    font-family: 'DM Mono', monospace;
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .header-meta span::before {
+    content: '— ';
+    color: var(--rule);
+  }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--paper-warm);
+    border: 1px solid var(--paper-rule);
+    border-left: 3px solid var(--accent);
+    padding: 1.5rem 2rem;
+    margin-bottom: 4rem;
+    border-radius: 2px;
+  }
+  .toc-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 0.75rem;
+  }
+  .toc ol {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.25rem 2rem;
+  }
+  .toc ol li { font-size: 13.5px; }
+  .toc ol li a {
+    color: var(--ink-mid);
+    text-decoration: none;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+  .toc ol li a:hover { color: var(--accent); }
+  .toc ol li a .n {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    min-width: 18px;
+  }
+
+  /* ── Sections ── */
+  .section {
+    margin-bottom: 4rem;
+    scroll-margin-top: 2rem;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .section-num {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 2rem;
+    color: var(--accent);
+    line-height: 1;
+    min-width: 2rem;
+  }
+  .section h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem;
+    font-weight: 400;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+
+  p { margin-bottom: 1rem; font-size: 15px; color: var(--ink-mid); }
+  p:last-child { margin-bottom: 0; }
+  strong { color: var(--ink); font-weight: 500; }
+
+  /* ── Steps ── */
+  .steps { list-style: none; }
+  .steps li {
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 0 1.25rem;
+    margin-bottom: 1.5rem;
+    align-items: start;
+  }
+  .step-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-body { padding-top: 6px; }
+  .step-title {
+    font-weight: 500;
+    font-size: 15px;
+    color: var(--ink);
+    margin-bottom: 0.35rem;
+    display: block;
+  }
+  .step-desc { font-size: 14px; color: var(--ink-mid); margin: 0; line-height: 1.6; }
+
+  /* ── Code blocks ── */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 1.1rem 1.4rem;
+    margin: 1rem 0;
+    overflow-x: auto;
+  }
+  .code-block pre {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--ink);
+    line-height: 1.65;
+    white-space: pre;
+  }
+  .code-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  code {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    background: var(--code-bg);
+    padding: 1px 5px;
+    border-radius: 2px;
+    color: var(--accent);
+  }
+
+  /* ── Callouts ── */
+  .callout {
+    padding: 1rem 1.4rem;
+    border-radius: 3px;
+    margin: 1.25rem 0;
+    font-size: 14px;
+    line-height: 1.65;
+  }
+  .callout p { font-size: 14px; margin-bottom: 0; }
+  .callout strong { display: block; margin-bottom: 0.3rem; font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; font-family: 'DM Mono', monospace; }
+  .callout-tip { background: var(--green-lt); border-left: 3px solid var(--green); color: #1A3D24; }
+  .callout-tip strong { color: var(--green); }
+  .callout-warn { background: var(--amber-lt); border-left: 3px solid var(--amber); color: #4A320A; }
+  .callout-warn strong { color: var(--amber); }
+  .callout-note { background: var(--accent-lt); border-left: 3px solid var(--accent); color: #5A2005; }
+  .callout-note strong { color: var(--accent); }
+
+  /* ── Session flow ── */
+  .flow {
+    margin: 1.5rem 0;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .flow-row {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    border-bottom: 1px solid var(--rule);
+  }
+  .flow-row:last-child { border-bottom: none; }
+  .flow-who {
+    background: var(--paper-warm);
+    padding: 0.85rem 1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    display: flex;
+    align-items: flex-start;
+    border-right: 1px solid var(--rule);
+    padding-top: 1.1rem;
+  }
+  .flow-who.lila { color: var(--accent); }
+  .flow-content {
+    padding: 0.85rem 1.25rem;
+    font-size: 14px;
+    color: var(--ink-mid);
+    line-height: 1.6;
+  }
+  .flow-content em { font-style: italic; color: var(--ink-muted); }
+
+  /* ── File tree ── */
+  .tree {
+    font-family: 'DM Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.9;
+    color: var(--ink-mid);
+    background: var(--code-bg);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 1.25rem 1.5rem;
+    margin: 1rem 0;
+  }
+  .tree .dir { color: var(--ink); font-weight: 500; }
+  .tree .new { color: var(--accent); }
+  .tree .ann { color: var(--ink-muted); font-size: 11px; }
+
+  /* ── Brief formats ── */
+  .brief-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1.25rem 0;
+  }
+  .brief-card {
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .brief-card-label {
+    background: var(--paper-warm);
+    border-bottom: 1px solid var(--rule);
+    padding: 0.5rem 1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  .brief-card pre {
+    padding: 1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--ink-mid);
+    white-space: pre-wrap;
+  }
+
+  /* ── Troubleshooting table ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin: 1rem 0;
+  }
+  thead tr { border-bottom: 1.5px solid var(--ink); }
+  thead th {
+    text-align: left;
+    padding: 0.5rem 0.75rem 0.75rem;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    font-weight: 400;
+  }
+  tbody tr { border-bottom: 1px solid var(--rule); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody td {
+    padding: 0.75rem;
+    vertical-align: top;
+    color: var(--ink-mid);
+    line-height: 1.55;
+  }
+  tbody td:first-child { color: var(--accent); font-family: 'DM Mono', monospace; font-size: 13px; }
+
+  /* ── Divider ── */
+  hr { border: none; border-top: 1px solid var(--rule); margin: 3rem 0; }
+
+  /* ── Print ── */
+  @media print {
+    .page { padding: 2rem; }
+    .header h1 { font-size: 2rem; }
+    .code-block { break-inside: avoid; }
+    .section { break-inside: avoid; }
+  }
+
+  @media (max-width: 600px) {
+    .page { padding: 2rem 1.25rem 4rem; }
+    .header h1 { font-size: 2.2rem; }
+    .toc ol { grid-template-columns: 1fr; }
+    .brief-grid { grid-template-columns: 1fr; }
+    .flow-row { grid-template-columns: 70px 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-eyebrow">Operator Runbook</div>
+    <h1>Running <em>Lila</em></h1>
+    <div class="header-meta">
+      <span>Model: claude-opus-4-6</span>
+      <span>Image: GPT-5.5 + GPT Image 2</span>
+      <span>Platform: Claude Managed Agents</span>
+      <span>Prompt: v1.3.0</span>
+    </div>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <div class="toc-label">Contents</div>
+    <ol>
+      <li><a href="#prereqs"><span class="n">01</span>Before you start</a></li>
+      <li><a href="#first-deploy"><span class="n">02</span>First-time setup</a></li>
+      <li><a href="#daily"><span class="n">03</span>Running a session</a></li>
+      <li><a href="#brief"><span class="n">04</span>Writing a brief</a></li>
+      <li><a href="#references"><span class="n">05</span>Using reference images</a></li>
+      <li><a href="#session-flow"><span class="n">06</span>What a session looks like</a></li>
+      <li><a href="#memory"><span class="n">07</span>Brand memory</a></li>
+      <li><a href="#outputs"><span class="n">08</span>Your output files</a></li>
+      <li><a href="#improving"><span class="n">09</span>Improving Lila over time</a></li>
+      <li><a href="#troubleshoot"><span class="n">10</span>Troubleshooting</a></li>
+      <li><a href="#reference"><span class="n">11</span>Quick reference</a></li>
+    </ol>
+  </div>
+
+
+  <!-- 01 -->
+  <div class="section" id="prereqs">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2>Before you start</h2>
+    </div>
+
+    <p>You need four things in place before Lila will run.</p>
+
+    <ul class="steps">
+      <li>
+        <span class="step-num">A</span>
+        <div class="step-body">
+          <span class="step-title">Python 3.11 or higher</span>
+          <p class="step-desc">Check with <code>python3 --version</code>. If you're below 3.11, install from python.org or via Homebrew: <code>brew install python@3.11</code></p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">B</span>
+        <div class="step-body">
+          <span class="step-title">Anthropic API key with Managed Agents beta access</span>
+          <p class="step-desc">Get it from <strong>console.anthropic.com → API Keys</strong>. You must have Claude Platform access — a standard API key may not include Managed Agents beta. Contact Anthropic if you need access.</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">C</span>
+        <div class="step-body">
+          <span class="step-title">OpenAI API key with GPT Image 2 access</span>
+          <p class="step-desc">Get it from <strong>platform.openai.com → API Keys</strong>. OpenAI requires Organization Verification before granting access to <code>gpt-image-2</code>. Complete verification at platform.openai.com → Settings → Organization before continuing.</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">D</span>
+        <div class="step-body">
+          <span class="step-title">The <code>ant</code> CLI installed</span>
+          <p class="step-desc">This is Anthropic's command-line tool for managing Managed Agents. Install it with Node.js:</p>
+          <div class="code-block"><pre>npm install -g @anthropic-ai/claude-code</pre></div>
+          <p class="step-desc">Confirm it's working: <code>ant --version</code></p>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+
+  <!-- 02 -->
+  <div class="section" id="first-deploy">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2>First-time setup</h2>
+    </div>
+    <p>Do this once. After this, you skip straight to <a href="#daily">§03</a> every time.</p>
+
+    <ul class="steps">
+      <li>
+        <span class="step-num">1</span>
+        <div class="step-body">
+          <span class="step-title">Install Python dependencies</span>
+          <div class="code-block"><pre>cd lila-agent
+pip install -r requirements.txt</pre></div>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">2</span>
+        <div class="step-body">
+          <span class="step-title">Create your <code>.env</code> file</span>
+          <p class="step-desc">Copy the template and fill in your API keys.</p>
+          <div class="code-block"><pre>cp .env.example .env</pre></div>
+          <p class="step-desc">Open <code>.env</code> in any text editor. Fill in at minimum:</p>
+          <div class="code-block"><pre>ANTHROPIC_API_KEY=sk-ant-...
+OPENAI_API_KEY=sk-...</pre></div>
+          <p class="step-desc">Leave <code>CLAUDE_AGENT_ID</code> and <code>CLAUDE_ENVIRONMENT_ID</code> blank — the deploy script fills them in.</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">3</span>
+        <div class="step-body">
+          <span class="step-title">Deploy Lila to Claude Platform</span>
+          <p class="step-desc">This creates the agent definition and execution environment on Anthropic's infrastructure, then writes the resulting IDs back to your <code>.env</code>.</p>
+          <div class="code-block"><pre>python scripts/deploy.py</pre></div>
+          <p class="step-desc">On success you'll see:</p>
+          <div class="code-block"><pre>[deploy] Agent ID: agt_01abc...
+[deploy] Environment ID: env_01xyz...
+[deploy] ✓ Lila is deployed.</pre></div>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">4</span>
+        <div class="step-body">
+          <span class="step-title">Run the eval suite to confirm everything works</span>
+          <div class="code-block"><pre>python evals/run_evals.py</pre></div>
+          <p class="step-desc">You should see 11/11 passed. If any fail, see <a href="#troubleshoot">§09 Troubleshooting</a>.</p>
+        </div>
+      </li>
+    </ul>
+
+    <div class="callout callout-tip">
+      <strong>One-time only</strong>
+      After setup, your <code>.env</code> contains your Agent ID and Environment ID. You never need to run <code>deploy.py</code> again unless you update the system prompt or rotate your API keys.
+    </div>
+  </div>
+
+
+  <!-- 03 -->
+  <div class="section" id="daily">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2>Running a session</h2>
+    </div>
+
+    <p>Every session requires two terminal windows. Start them in this order.</p>
+
+    <ul class="steps">
+      <li>
+        <span class="step-num">1</span>
+        <div class="step-body">
+          <span class="step-title">Terminal 1 — start the image generation server</span>
+          <p class="step-desc">This runs the GPT Image 2 server locally. It must be running before you start a session. Keep this terminal open the entire time.</p>
+          <div class="code-block"><pre>python mcp_servers/image_gen_server.py</pre></div>
+          <p class="step-desc">You'll see:</p>
+          <div class="code-block"><pre>[image_gen_server] Starting on port 8765
+[image_gen_server] Outputs → lila-agent/data/outputs
+[image_gen_server] Model: gpt-5.5 + image_generation tool</pre></div>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">2</span>
+        <div class="step-body">
+          <span class="step-title">Terminal 2 — start a session</span>
+          <div class="code-block"><pre>python scripts/run_agent.py</pre></div>
+          <p class="step-desc">Lila will prompt you for a brief. Type it and press Enter twice when done.</p>
+          <p class="step-desc" style="margin-top: 0.6rem;">To attach visual references, add <code>--references</code> before starting:</p>
+          <div class="code-block"><pre>python scripts/run_agent.py --references moodboard.jpg ref2.png</pre></div>
+          <p class="step-desc">See <a href="#references">§05 Using reference images</a> for full details.</p>
+        </div>
+      </li>
+    </ul>
+
+    <div class="callout callout-warn">
+      <strong>Don't skip Terminal 1</strong>
+      If the image generation server isn't running when Lila tries to generate, she'll report the error honestly and no images will be created. You'll need to restart the server and run the session again.
+    </div>
+  </div>
+
+
+  <!-- 04 -->
+  <div class="section" id="brief">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2>Writing a brief</h2>
+    </div>
+
+    <p>Lila works with whatever you give her — minimal or detailed. The more you include, the fewer questions she asks before getting to work.</p>
+
+    <div class="brief-grid">
+      <div class="brief-card">
+        <div class="brief-card-label">Minimal — Lila will ask</div>
+        <pre>New campaign for my candle brand
+Ember & Oak.</pre>
+      </div>
+      <div class="brief-card">
+        <div class="brief-card-label">Complete — she gets straight to it</div>
+        <pre>Brand: Ember & Oak
+Product: Autumn soy candle collection
+(3 scents: Woodsmoke, Harvest, Rain)
+Audience: Women 28–45, slow living
+Channel: Instagram feed + Stories
+CTA: Shop the Autumn Collection
+Vibe: Warm, earthy, editorial
+Website: emberoak.com
+Launch: October 1</pre>
+      </div>
+    </div>
+
+    <p>The fields Lila needs before she can propose directions — she'll ask if you don't include them:</p>
+
+    <ul class="steps">
+      <li>
+        <span class="step-num" style="background: var(--paper-warm); color: var(--ink); border: 1px solid var(--rule);">→</span>
+        <div class="step-body">
+          <span class="step-title">Product name and one-sentence description</span>
+          <p class="step-desc">What it is, what it does, what makes it worth photographing.</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num" style="background: var(--paper-warm); color: var(--ink); border: 1px solid var(--rule);">→</span>
+        <div class="step-body">
+          <span class="step-title">Target audience</span>
+          <p class="step-desc">Age range, aesthetic values, or platform behaviour. Shapes every composition choice.</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num" style="background: var(--paper-warm); color: var(--ink); border: 1px solid var(--rule);">→</span>
+        <div class="step-body">
+          <span class="step-title">Channel and format</span>
+          <p class="step-desc">Instagram feed, Stories, LinkedIn, paid social — or just say all of them and she'll propose a set.</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num" style="background: var(--paper-warm); color: var(--ink); border: 1px solid var(--rule);">→</span>
+        <div class="step-body">
+          <span class="step-title">CTA or launch message</span>
+          <p class="step-desc">The single thing you want someone to do or feel after seeing the image.</p>
+        </div>
+      </li>
+    </ul>
+
+    <p style="margin-top: 1.25rem;">You can also skip the interactive prompt entirely and pass the brief inline:</p>
+
+    <div class="code-block">
+      <span class="code-label">Inline brief</span>
+      <pre>python scripts/run_agent.py --brief "Brand: Ember & Oak. Channel: Instagram..."</pre>
+    </div>
+    <div class="code-block">
+      <span class="code-label">Brief from a file (good for repeat clients)</span>
+      <pre>python scripts/run_agent.py --brief "$(cat briefs/emberoak-autumn.txt)"</pre>
+    </div>
+
+    <div class="callout callout-tip">
+      <strong>Tip</strong>
+      Keep a <code>briefs/</code> folder in the project root with one <code>.txt</code> file per client. Saves retyping and gives you a record of what you briefed for each campaign.
+    </div>
+  </div>
+
+
+  <!-- 05 -->
+  <div class="section" id="references">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2>Using reference images</h2>
+    </div>
+
+    <p>You can pass images to Lila at the start of any session as aesthetic inspiration. She reads them for visual signals — palette, density, composition, photography mood — and uses those signals to inform her direction proposals. She does not copy them.</p>
+
+    <div class="callout callout-tip">
+      <strong>Good references to use</strong>
+      Competitor campaigns you admire. Brand imagery from another industry with the right feel. Magazine editorials. Packaging photography. Anything that captures the mood, palette, or composition style you're after — it doesn't have to be social content.
+    </div>
+
+    <ul class="steps">
+      <li>
+        <span class="step-num">1</span>
+        <div class="step-body">
+          <span class="step-title">Pass images with the <code>--references</code> flag</span>
+          <p class="step-desc">Accepted formats: JPG, PNG, WEBP, GIF. Pass one image or several.</p>
+          <div class="code-block">
+            <span class="code-label">One reference</span>
+            <pre>python scripts/run_agent.py --references moodboard.jpg</pre>
+          </div>
+          <div class="code-block">
+            <span class="code-label">Multiple references</span>
+            <pre>python scripts/run_agent.py --references ref1.jpg ref2.png ref3.webp</pre>
+          </div>
+          <div class="code-block">
+            <span class="code-label">References + inline brief</span>
+            <pre>python scripts/run_agent.py --brief "Autumn candle launch, Instagram" --references ref1.jpg ref2.jpg</pre>
+          </div>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">2</span>
+        <div class="step-body">
+          <span class="step-title">Lila confirms the images loaded</span>
+          <p class="step-desc">You'll see a confirmation line before the session starts:</p>
+          <div class="code-block"><pre>[dim] 2 reference image(s) attached.</pre></div>
+          <p class="step-desc">If a file path is wrong or the format isn't supported, she'll warn you and skip that file — the session continues with the remaining references.</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">3</span>
+        <div class="step-body">
+          <span class="step-title">Lila names what she observed</span>
+          <p class="step-desc">In her direction proposals, she'll cite the specific signals she extracted — not vague adjectives. Expect something like:</p>
+          <div class="code-block"><pre>"The references favour warm cream tones with strong negative space
+and natural-light photography — that maps to Editorial Restraint.
+I'm carrying the cream-to-ochre palette into Direction 1."</pre></div>
+          <p class="step-desc">If her read of the references doesn't match what you intended, just tell her: <em>"The palette is right but I want something denser, more layered."</em></p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">4</span>
+        <div class="step-body">
+          <span class="step-title">What Lila will and won't do with references</span>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.75rem;">
+            <div style="background: var(--green-lt); border: 1px solid #b6d9c2; border-radius: 3px; padding: 1rem;">
+              <p style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green); margin-bottom: 0.6rem; font-size: 11px;">She will</p>
+              <p style="font-size: 13px; color: #1A3D24; line-height: 1.6; margin: 0;">Borrow a palette · Mirror density and negative space · Match photographic mood and lighting style · Echo typographic weight or scale · Name what she observed specifically</p>
+            </div>
+            <div style="background: #fdf0ef; border: 1px solid #f0c4be; border-radius: 3px; padding: 1rem;">
+              <p style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #a03020; margin-bottom: 0.6rem; font-size: 11px;">She won't</p>
+              <p style="font-size: 13px; color: #5A2005; line-height: 1.6; margin: 0;">Reproduce a layout · Copy the subject matter · Reproduce visible text · Describe the images back to you instead of using them</p>
+            </div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">5</span>
+        <div class="step-body">
+          <span class="step-title">Conflicts between references and brief are flagged</span>
+          <p class="step-desc">If your references and your brief point in different directions — dark cinematic images but a brief asking for something bright and playful — Lila will name the conflict and ask which should take priority before proposing anything:</p>
+          <div class="code-block"><pre>"Your references lean Cinematic Dark, but the brief describes
+something playful and energetic. Which should take priority,
+or should I blend them into a third direction?"</pre></div>
+        </div>
+      </li>
+    </ul>
+
+    <div class="callout callout-note">
+      <strong>No size limit enforced in code — but keep it reasonable</strong>
+      Large images take longer to encode and add to context cost. Crop to the relevant area if you're pulling from a large source file. 1–4 references is the practical sweet spot; more than that rarely changes the output.
+    </div>
+  </div>
+
+
+  <!-- 06 (was 05) -->
+  <div class="section" id="session-flow">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <h2>What a session looks like</h2>
+    </div>
+
+    <p>A complete session from brief to delivered assets. Every step below is consistent — Lila won't skip any of them.</p>
+
+    <div class="flow">
+      <div class="flow-row">
+        <div class="flow-who">You</div>
+        <div class="flow-content">Submit your brief — minimal or complete. Optionally attach reference images with <code>--references</code>.</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-who lila">Lila</div>
+        <div class="flow-content">If reference images were attached, reads each one for aesthetic signals: palette, density, composition, photography mood, and register. Fetches your brand website if a URL was in the brief. Reads the skill file. If anything critical is missing, asks up to 3 focused questions.</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-who">You</div>
+        <div class="flow-content">Answer any clarifying questions. <em>Skip this row if your brief was complete.</em></div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-who lila">Lila</div>
+        <div class="flow-content">Proposes <strong>2–3 named visual directions</strong>. Each includes: a name, a 2–3 sentence concept, an aesthetic register, a hex palette, and a list of which assets the set needs and why.</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-who">You</div>
+        <div class="flow-content">Choose a direction, or ask for adjustments. <em>"Direction 2, but warmer palette"</em> works fine.</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-who lila">Lila</div>
+        <div class="flow-content">Builds the <strong>asset board</strong> — a table listing every image to be generated, its purpose, format, copy overlay, and any notes.</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-who lila">Lila</div>
+        <div class="flow-content"><strong>Approval gate.</strong> Shows you the asset board, states the total image count, and explicitly asks for your go-ahead before touching the image API. She will not generate without this.</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-who">You</div>
+        <div class="flow-content">Say yes (or request any last changes to the board first).</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-who lila">Lila</div>
+        <div class="flow-content">Searches for real-world visual references for each asset. Generates each image via GPT Image 2. After each generation, reads the revised prompt GPT-5.5 returned and carries any adjustments forward to the next asset for visual consistency.</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-who lila">Lila</div>
+        <div class="flow-content">Saves all files to <code>data/outputs/</code> with the naming convention <code>&lt;brand&gt;-&lt;campaign&gt;-&lt;asset&gt;-&lt;format&gt;.png</code>. Delivers: file paths, concept summary, asset board, 2–3 caption options per asset, alt text, follow-up suggestions.</div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-who lila">Lila</div>
+        <div class="flow-content"><strong>Memory proposal.</strong> Asks if you'd like to save anything from this session for future campaigns with this brand. Shows you the exact block for approval before saving anything.</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 06 -->
+  <div class="section" id="memory">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <h2>Brand memory</h2>
+    </div>
+
+    <p>After a completed session, Lila will propose saving a memory entry for that brand. On the next session for the same brand, she'll load it automatically and use it as a starting point.</p>
+
+    <ul class="steps">
+      <li>
+        <span class="step-num">1</span>
+        <div class="step-body">
+          <span class="step-title">At session end, Lila proposes a memory block</span>
+          <p class="step-desc">She shows you the exact entry — register, palette, copy voice, what worked, what to avoid — and asks for confirmation before saving anything.</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">2</span>
+        <div class="step-body">
+          <span class="step-title">Edit any field before confirming</span>
+          <p class="step-desc">Tell Lila what to change: <em>"Change 'what worked' to: lifestyle shots with morning light outperformed product-only frames."</em> She'll update the block and ask again.</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">3</span>
+        <div class="step-body">
+          <span class="step-title">Confirm — Lila saves to <code>data/memory/&lt;brand&gt;.json</code></span>
+          <p class="step-desc">Memory files are plain JSON. You can open and edit them directly if you ever need to correct something between sessions.</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">4</span>
+        <div class="step-body">
+          <span class="step-title">Next session with the same brand — memory loads automatically</span>
+          <p class="step-desc">Lila presents the prior register and palette as defaults: <em>"Based on your last campaign, I'd suggest continuing with Editorial Restraint — here it is, plus two alternatives."</em> You can always override.</p>
+        </div>
+      </li>
+    </ul>
+
+    <div class="callout callout-note">
+      <strong>Important</strong>
+      Lila never saves memory automatically. She always proposes, you always approve. This is Production Rule #2 and cannot be bypassed.
+    </div>
+  </div>
+
+
+  <!-- 07 -->
+  <div class="section" id="outputs">
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <h2>Your output files</h2>
+    </div>
+
+    <p>All generated images land in <code>data/outputs/</code>. Files are named:</p>
+
+    <div class="code-block"><pre>&lt;brand&gt;-&lt;campaign&gt;-&lt;asset&gt;-&lt;format&gt;.png
+
+emberoak-autumn-launch-hero-4x5.png
+emberoak-autumn-feature-card-1x1.png
+emberoak-autumn-story-cta-9x16.png</pre></div>
+
+    <p>The folder is gitignored — your images never end up in version control. Back them up separately or push them to your preferred storage.</p>
+
+    <p>Format dimensions for reference:</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Format slug</th>
+          <th>Dimensions</th>
+          <th>Use case</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1x1</td><td>1080 × 1080</td><td>Instagram feed, LinkedIn, multi-platform safe</td></tr>
+        <tr><td>4x5</td><td>1080 × 1350</td><td>Instagram portrait, paid social, launch posts</td></tr>
+        <tr><td>9x16</td><td>1080 × 1920</td><td>Stories, Reels covers, TikTok</td></tr>
+        <tr><td>landscape_191</td><td>1200 × 628</td><td>LinkedIn link posts, Meta ads, Twitter cards</td></tr>
+        <tr><td>landscape_169</td><td>1920 × 1080</td><td>YouTube thumbnails, website hero stills</td></tr>
+        <tr><td>carousel</td><td>1080 × 1350</td><td>Multi-slide feed sequences</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+
+  <!-- 08 -->
+  <div class="section" id="improving">
+    <div class="section-header">
+      <span class="section-num">09</span>
+      <h2>Improving Lila over time</h2>
+    </div>
+
+    <p>Lila improves through two mechanisms: brand memory (automatic, session-by-session) and prompt iteration (developer-driven, based on what you observe in logs).</p>
+
+    <p>For prompt iteration, the cycle is:</p>
+
+    <ul class="steps">
+      <li>
+        <span class="step-num">1</span>
+        <div class="step-body">
+          <span class="step-title">Find a failure pattern in the logs</span>
+          <p class="step-desc">Session logs are in <code>logs/lila-YYYY-MM-DD.log</code>. Look for tool calls in the wrong order, missing approvals, or outputs that didn't match the brief.</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">2</span>
+        <div class="step-body">
+          <span class="step-title">Fix one thing in the prompt</span>
+          <p class="step-desc">Edit <code>prompts/system.md</code> or <code>skills/image-assets/SKILL.md</code>. Change one instruction. Don't rewrite multiple sections at once — you won't know what fixed it.</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">3</span>
+        <div class="step-body">
+          <span class="step-title">Run the eval suite</span>
+          <div class="code-block"><pre>python evals/run_evals.py</pre></div>
+          <p class="step-desc">Must pass 16/16 before deploying. If it doesn't, keep refining.</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">4</span>
+        <div class="step-body">
+          <span class="step-title">Commit, tag, and deploy</span>
+          <div class="code-block"><pre>git add prompts/system.md
+git commit -m "fix(prompt): what you changed and why"
+git tag prompt-v1.2.0
+python scripts/deploy.py</pre></div>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">5</span>
+        <div class="step-body">
+          <span class="step-title">Log the change</span>
+          <p class="step-desc">Open <code>memory/prompt_improvement_log.md</code> and add an entry: what failed, what you changed, eval score before and after.</p>
+        </div>
+      </li>
+    </ul>
+
+    <div class="callout callout-tip">
+      <strong>Rollback</strong>
+      If a prompt change causes a regression, restore the last good version and redeploy:
+      <div class="code-block" style="margin-top: 0.75rem;"><pre>cp prompts/versions/system_v1.0.md prompts/system.md
+python scripts/deploy.py</pre></div>
+    </div>
+  </div>
+
+
+  <!-- 09 -->
+  <div class="section" id="troubleshoot">
+    <div class="section-header">
+      <span class="section-num">10</span>
+      <h2>Troubleshooting</h2>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Error</th>
+          <th>Cause</th>
+          <th>Fix</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>MCP server not running</td>
+          <td>Terminal 1 was closed or never started</td>
+          <td>Open a new terminal and run <code>python mcp_servers/image_gen_server.py</code> first</td>
+        </tr>
+        <tr>
+          <td>ANTHROPIC_API_KEY not set</td>
+          <td><code>.env</code> is missing or the key is blank</td>
+          <td>Open <code>.env</code>, paste your key, save. Then re-run.</td>
+        </tr>
+        <tr>
+          <td>CLAUDE_AGENT_ID not set</td>
+          <td>deploy.py hasn't been run yet</td>
+          <td>Run <code>python scripts/deploy.py</code> once to create the agent and write the ID to <code>.env</code></td>
+        </tr>
+        <tr>
+          <td>GPT Image 2 access denied</td>
+          <td>OpenAI Organization Verification not completed</td>
+          <td>Go to platform.openai.com → Settings → Organization and complete verification</td>
+        </tr>
+        <tr>
+          <td>Evals failing after prompt change</td>
+          <td>Prompt change broke an existing behavior</td>
+          <td>Roll back: <code>cp prompts/versions/system_v1.0.md prompts/system.md</code>, then redeploy</td>
+        </tr>
+        <tr>
+          <td>Brand memory not loading</td>
+          <td>Brand slug in run_agent.py doesn't match the saved file</td>
+          <td>Check <code>data/memory/</code> — filename must match the brand slug exactly. Rename if needed.</td>
+        </tr>
+        <tr>
+          <td><code>ant: command not found</code></td>
+          <td><code>ant</code> CLI not installed</td>
+          <td>Run <code>npm install -g @anthropic-ai/claude-code</code>, then try again</td>
+        </tr>
+        <tr>
+          <td>Reference image skipped — unsupported type</td>
+          <td>File isn't JPG, PNG, WEBP, or GIF</td>
+          <td>Convert to one of the supported formats and re-run with the new path</td>
+        </tr>
+        <tr>
+          <td>Reference image skipped — file not found</td>
+          <td>Path passed to <code>--references</code> is wrong</td>
+          <td>Check the path with <code>ls path/to/image.jpg</code>. Use absolute paths if running from outside the project root.</td>
+        </tr>
+        <tr>
+          <td>Lila ignored the references / gave vague observations</td>
+          <td>References may have been too similar, too small, or too abstract to extract clear signals</td>
+          <td>Try with 1–2 stronger, higher-contrast references. Tell Lila explicitly what drew you to them: "I like the warm palette and negative space in these."</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+  <!-- 10 -->
+  <div class="section" id="reference">
+    <div class="section-header">
+      <span class="section-num">11</span>
+      <h2>Quick reference</h2>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>Command</th><th>What it does</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>python mcp_servers/image_gen_server.py</td><td>Start image generation server (Terminal 1, always first)</td></tr>
+        <tr><td>python scripts/run_agent.py</td><td>Start a new session with interactive brief prompt</td></tr>
+        <tr><td>python scripts/run_agent.py --brief "..."</td><td>Start a session with brief passed inline</td></tr>
+        <tr><td>python scripts/run_agent.py --references img.jpg</td><td>Attach one reference image as aesthetic inspiration</td></tr>
+        <tr><td>python scripts/run_agent.py --references a.jpg b.png --brief "..."</td><td>Attach multiple references with an inline brief</td></tr>
+        <tr><td>python scripts/deploy.py</td><td>Deploy or update Lila on Claude Platform</td></tr>
+        <tr><td>python evals/run_evals.py</td><td>Run all 16 eval cases — must pass before prompt deploy</td></tr>
+        <tr><td>python evals/run_evals.py --case approval_gate_enforced</td><td>Run a single eval case by ID</td></tr>
+        <tr><td>python scripts/test_tool.py image_generate</td><td>Test image generation in isolation</td></tr>
+        <tr><td>python scripts/test_tool.py file_io</td><td>Test file save/fetch round-trip</td></tr>
+        <tr><td>pytest tests/ -v</td><td>Run all unit, integration, and adversarial tests</td></tr>
+      </tbody>
+    </table>
+
+    <hr>
+
+    <div class="tree">
+      <div><span class="dir">lila-agent/</span></div>
+      <div>&nbsp;&nbsp;data/outputs/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ann">← your generated images land here</span></div>
+      <div>&nbsp;&nbsp;data/memory/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ann">← brand memory JSON files</span></div>
+      <div>&nbsp;&nbsp;logs/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ann">← session logs for debugging</span></div>
+      <div>&nbsp;&nbsp;prompts/system.md &nbsp;<span class="ann">← edit this to improve Lila</span></div>
+      <div>&nbsp;&nbsp;skills/image-assets/<span class="ann">← format catalog + registers</span></div>
+      <div>&nbsp;&nbsp;evals/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ann">← run before every prompt change</span></div>
+      <div>&nbsp;&nbsp;memory/prompt_improvement_log.md &nbsp;<span class="ann">← log every fix</span></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
